@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869454127155",
+    "project_id": "learnit-ec661",
+    "storage_bucket": "learnit-ec661.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869454127155:android:275e5209f3a8ad2a170346",
+        "android_client_info": {
+          "package_name": "np.com.lashman.learnit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGuIUIve9Kz2DIgaGCHBigh8nnEM14Qrc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
