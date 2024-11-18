@@ -187,7 +187,7 @@ private fun SubjectScreen(
                 icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
                 text = { Text(text = "Add Task") },
                 expanded = isFABExpanded,
-                containerColor = Color(0xFF00D2FF) // Set
+                containerColor = Color(0xFF00D2FF)
             )
         }
     ) { paddingValue ->
