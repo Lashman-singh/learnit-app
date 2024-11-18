@@ -17,7 +17,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.auth.FirebaseAuth
 import np.com.lashman.learnit.presentation.subject.SubjectScreenNavArgs
 import np.com.lashman.learnit.presentation.task.TaskScreenNavArgs
 import np.com.lashman.learnit.util.SnackbarEvent
@@ -60,9 +63,12 @@ import np.com.lashman.learnit.presentation.components.DeleteDialog
 import np.com.lashman.learnit.presentation.components.SubjectCard
 import np.com.lashman.learnit.presentation.components.studySessionsList
 import np.com.lashman.learnit.presentation.components.tasksList
+import np.com.lashman.learnit.presentation.destinations.DashboardScreenRouteDestination
 import np.com.lashman.learnit.presentation.destinations.SessionScreenRouteDestination
+import np.com.lashman.learnit.presentation.destinations.SignInScreenDestination
 import np.com.lashman.learnit.presentation.destinations.SubjectScreenRouteDestination
 import np.com.lashman.learnit.presentation.destinations.TaskScreenRouteDestination
+import np.com.lashman.learnit.presentation.destinations.WikipediaScreenDestination
 
 @RootNavGraph(start = true)
 @Destination
@@ -70,47 +76,57 @@ import np.com.lashman.learnit.presentation.destinations.TaskScreenRouteDestinati
 fun DashboardScreenRoute(
     navigator: DestinationsNavigator
 ) {
+    val auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser
 
-    val viewModel: DashboardViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
-    val recentSessions by viewModel.recentSessions.collectAsStateWithLifecycle()
+    if (currentUser == null) {
+        // If user is not authenticated, navigate to Sign-In screen
+        navigator.navigate(SignInScreenDestination())
+    } else {
+        val viewModel: DashboardViewModel = hiltViewModel()
+        val state by viewModel.state.collectAsStateWithLifecycle()
+        val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+        val recentSessions by viewModel.recentSessions.collectAsStateWithLifecycle()
 
-    DashboardScreen(
-        state = state,
-        tasks = tasks,
-        recentSessions = recentSessions,
-        onEvent = viewModel::onEvent,
-        snackbarEvent = viewModel.snackbarEventFlow,
-        onSubjectCardClick = { subjectId ->
-            subjectId?.let {
-                val navArg = SubjectScreenNavArgs(subjectId = subjectId)
-                navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
+        DashboardScreen(
+            state = state,
+            tasks = tasks,
+            onEvent = viewModel::onEvent,
+            snackbarEvent = viewModel.snackbarEventFlow,
+            onSignOut = {
+                auth.signOut()
+                navigator.navigate(SignInScreenDestination()) {
+                    popUpTo(DashboardScreenRouteDestination.route) { inclusive = true }
+                }
+            },
+            onSubjectCardClick = { subjectId ->
+                subjectId?.let {
+                    val navArg = SubjectScreenNavArgs(subjectId = subjectId)
+                    navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
+                }
+            },
+            onTaskCardClick = { taskId ->
+                val navArg = TaskScreenNavArgs(taskId = taskId, subjectId = null)
+                navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+            },
+            onWikiButtonClick = {
+                navigator.navigate(WikipediaScreenDestination())
             }
-        },
-        onTaskCardClick = { taskId ->
-            val navArg = TaskScreenNavArgs(taskId = taskId, subjectId = null)
-            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
-        },
-        onStartSessionButtonClick = {
-            navigator.navigate(SessionScreenRouteDestination())
-        }
-    )
+        )
+    }
 }
-
 
 @Composable
 private fun DashboardScreen(
     state: DashboardState,
     tasks: List<Task>,
-    recentSessions: List<Session>,
     onEvent: (DashboardEvent) -> Unit,
     snackbarEvent: SharedFlow<SnackbarEvent>,
+    onSignOut: () -> Unit,
     onSubjectCardClick: (Int?) -> Unit,
     onTaskCardClick: (Int?) -> Unit,
-    onStartSessionButtonClick: () -> Unit
+    onWikiButtonClick: () -> Unit
 ) {
-
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -125,7 +141,6 @@ private fun DashboardScreen(
                         duration = event.duration
                     )
                 }
-
                 SnackbarEvent.NavigateUp -> {}
             }
         }
@@ -160,7 +175,7 @@ private fun DashboardScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = { DashboardScreenTopBar() }
+        topBar = { DashboardScreenTopBar(onSignOut = onSignOut) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -186,13 +201,20 @@ private fun DashboardScreen(
                 )
             }
             item {
-                Button(
-                    onClick = onStartSessionButtonClick,
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 48.dp, vertical = 20.dp)
+                        .padding(horizontal = 48.dp, vertical = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text(text = "Start Study Session")
+                    Button(
+                        onClick = onWikiButtonClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00d2ff)
+                        )
+                    ) {
+                        Text(text = "Wikipedia")
+                    }
                 }
             }
             tasksList(
@@ -206,29 +228,28 @@ private fun DashboardScreen(
             item {
                 Spacer(modifier = Modifier.height(20.dp))
             }
-            studySessionsList(
-                sectionTitle = "RECENT STUDY SESSIONS",
-                emptyListText = "You don't have any recent study sessions.\n " +
-                        "Start a study session to begin recording your progress.",
-                sessions = recentSessions,
-                onDeleteIconClick = {
-                    onEvent(DashboardEvent.OnDeleteSessionButtonClick(it))
-                    isDeleteSessionDialogOpen = true
-                }
-            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DashboardScreenTopBar() {
+private fun DashboardScreenTopBar(onSignOut: () -> Unit) {
     CenterAlignedTopAppBar(
         title = {
             Text(
                 text = "LearnIT",
                 style = MaterialTheme.typography.headlineMedium
             )
+        },
+        actions = {
+            IconButton(onClick = onSignOut) {
+                Icon(
+                    imageVector = Icons.Filled.ExitToApp,
+                    contentDescription = "Sign Out",
+                    tint = Color.Black
+                )
+            }
         }
     )
 }
@@ -245,12 +266,6 @@ private fun CountCardsSection(
             modifier = Modifier.weight(1f),
             headingText = "Subject Count",
             count = "$subjectCount"
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        CountCard(
-            modifier = Modifier.weight(1f),
-            headingText = "Studied Hours",
-            count = studiedHours
         )
         Spacer(modifier = Modifier.width(10.dp))
         CountCard(
