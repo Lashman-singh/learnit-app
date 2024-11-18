@@ -40,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
@@ -185,7 +186,8 @@ private fun SubjectScreen(
                 onClick = onAddTaskButtonClick,
                 icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
                 text = { Text(text = "Add Task") },
-                expanded = isFABExpanded
+                expanded = isFABExpanded,
+                containerColor = Color(0xFF00D2FF) // Set
             )
         }
     ) { paddingValue ->
@@ -227,16 +229,6 @@ private fun SubjectScreen(
             item {
                 Spacer(modifier = Modifier.height(20.dp))
             }
-            studySessionsList(
-                sectionTitle = "RECENT STUDY SESSIONS",
-                emptyListText = "You don't have any recent study sessions.\n " +
-                        "Start a study session to begin recording your progress.",
-                sessions = state.recentSessions,
-                onDeleteIconClick = {
-                    isDeleteSessionDialogOpen = true
-                    onEvent(SubjectEvent.OnDeleteSessionButtonClick(it))
-                }
-            )
         }
     }
 }
@@ -313,24 +305,5 @@ private fun SubjectOverviewSection(
             count = studiedHours
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Box(
-            modifier = Modifier.size(75.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.fillMaxSize(),
-                progress = 1f,
-                strokeWidth = 4.dp,
-                strokeCap = StrokeCap.Round,
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-            CircularProgressIndicator(
-                modifier = Modifier.fillMaxSize(),
-                progress = progress,
-                strokeWidth = 4.dp,
-                strokeCap = StrokeCap.Round
-            )
-            Text(text = "$percentageProgress%")
-        }
     }
 }
