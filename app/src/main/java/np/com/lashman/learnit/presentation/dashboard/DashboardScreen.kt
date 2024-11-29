@@ -45,30 +45,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.auth.FirebaseAuth
-import np.com.lashman.learnit.presentation.subject.SubjectScreenNavArgs
-import np.com.lashman.learnit.presentation.task.TaskScreenNavArgs
-import np.com.lashman.learnit.util.SnackbarEvent
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import np.com.lashman.learnit.R
-import np.com.lashman.learnit.domain.model.Session
 import np.com.lashman.learnit.domain.model.Subject
 import np.com.lashman.learnit.domain.model.Task
 import np.com.lashman.learnit.presentation.components.AddSubjectDialog
 import np.com.lashman.learnit.presentation.components.CountCard
 import np.com.lashman.learnit.presentation.components.DeleteDialog
 import np.com.lashman.learnit.presentation.components.SubjectCard
-import np.com.lashman.learnit.presentation.components.studySessionsList
 import np.com.lashman.learnit.presentation.components.tasksList
 import np.com.lashman.learnit.presentation.destinations.DashboardScreenRouteDestination
-import np.com.lashman.learnit.presentation.destinations.SessionScreenRouteDestination
 import np.com.lashman.learnit.presentation.destinations.SignInScreenDestination
 import np.com.lashman.learnit.presentation.destinations.SubjectScreenRouteDestination
 import np.com.lashman.learnit.presentation.destinations.TaskScreenRouteDestination
 import np.com.lashman.learnit.presentation.destinations.WikipediaScreenDestination
+import np.com.lashman.learnit.presentation.subject.SubjectScreenNavArgs
+import np.com.lashman.learnit.presentation.task.TaskScreenNavArgs
+import np.com.lashman.learnit.util.SnackbarEvent
 
 @RootNavGraph(start = true)
 @Destination
@@ -86,7 +83,6 @@ fun DashboardScreenRoute(
         val viewModel: DashboardViewModel = hiltViewModel()
         val state by viewModel.state.collectAsStateWithLifecycle()
         val tasks by viewModel.tasks.collectAsStateWithLifecycle()
-        val recentSessions by viewModel.recentSessions.collectAsStateWithLifecycle()
 
         DashboardScreen(
             state = state,
@@ -128,7 +124,6 @@ private fun DashboardScreen(
     onWikiButtonClick: () -> Unit
 ) {
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
-    var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -158,18 +153,6 @@ private fun DashboardScreen(
         onConfirmButtonClick = {
             onEvent(DashboardEvent.SaveSubject)
             isAddSubjectDialogOpen = false
-        }
-    )
-
-    DeleteDialog(
-        isOpen = isDeleteSessionDialogOpen,
-        title = "Delete Session?",
-        bodyText = "Are you sure, you want to delete this session? Your studied hours will be reduced " +
-                "by this session time. This action can not be undone.",
-        onDismissRequest = { isDeleteSessionDialogOpen = false },
-        onConfirmButtonClick = {
-            onEvent(DashboardEvent.DeleteSession)
-            isDeleteSessionDialogOpen = false
         }
     )
 

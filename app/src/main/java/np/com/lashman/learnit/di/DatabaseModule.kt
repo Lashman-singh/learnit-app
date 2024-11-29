@@ -2,14 +2,15 @@ package np.com.lashman.learnit.di
 
 import android.app.Application
 import androidx.room.Room
-import np.com.lashman.learnit.data.local.AppDatabase
-import np.com.lashman.learnit.data.local.SessionDao
-import np.com.lashman.learnit.data.local.SubjectDao
-import np.com.lashman.learnit.data.local.TaskDao
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import np.com.lashman.learnit.data.local.AppDatabase
+import np.com.lashman.learnit.data.local.SubjectDao
+import np.com.lashman.learnit.data.local.TaskDao
 import javax.inject.Singleton
 
 @Module
@@ -28,6 +29,7 @@ object DatabaseModule {
                 AppDatabase::class.java,
                 "learnit.db"
             )
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 
@@ -42,10 +44,11 @@ object DatabaseModule {
     fun provideTaskDaoDao(database: AppDatabase): TaskDao {
         return database.taskDao()
     }
-
-    @Provides
-    @Singleton
-    fun provideSessionDao(database: AppDatabase): SessionDao {
-        return database.sessionDao()
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Drop the 'Session' table if it exists (since you've deleted it)
+            database.execSQL("DROP TABLE IF EXISTS session")
+        }
     }
+
 }

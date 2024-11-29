@@ -4,14 +4,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import np.com.lashman.learnit.domain.model.Session
-import np.com.lashman.learnit.domain.model.Subject
-import np.com.lashman.learnit.domain.model.Task
-import np.com.lashman.learnit.domain.repository.SessionRepository
-import np.com.lashman.learnit.domain.repository.SubjectRepository
-import np.com.lashman.learnit.domain.repository.TaskRepository
-import np.com.lashman.learnit.util.SnackbarEvent
-import np.com.lashman.learnit.util.toHours
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +14,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import np.com.lashman.learnit.domain.model.Subject
+import np.com.lashman.learnit.domain.model.Task
+import np.com.lashman.learnit.domain.repository.SubjectRepository
+import np.com.lashman.learnit.domain.repository.TaskRepository
+import np.com.lashman.learnit.util.SnackbarEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val subjectRepository: SubjectRepository,
-    private val sessionRepository: SessionRepository,
     private val taskRepository: TaskRepository
 ) : ViewModel() {
 
@@ -36,14 +32,12 @@ class DashboardViewModel @Inject constructor(
         _state,
         subjectRepository.getTotalSubjectCount(),
         subjectRepository.getTotalGoalHours(),
-        subjectRepository.getAllSubjects(),
-        sessionRepository.getTotalSessionsDuration()
-    ) { state, subjectCount, goalHours, subjects, totalSessionDuration ->
+        subjectRepository.getAllSubjects()
+    ) { state, subjectCount, goalHours, subjects ->
         state.copy(
             totalSubjectCount = subjectCount,
             totalGoalStudyHours = goalHours,
-            subjects = subjects,
-            totalStudiedHours = totalSessionDuration.toHours()
+            subjects = subjects
         )
     }.stateIn(
         scope = viewModelScope,
@@ -52,13 +46,6 @@ class DashboardViewModel @Inject constructor(
     )
 
     val tasks: StateFlow<List<Task>> = taskRepository.getAllUpcomingTasks()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = emptyList()
-        )
-
-    val recentSessions: StateFlow<List<Session>> = sessionRepository.getRecentFiveSessions()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
@@ -88,14 +75,7 @@ class DashboardViewModel @Inject constructor(
                 }
             }
 
-            is DashboardEvent.OnDeleteSessionButtonClick -> {
-                _state.update {
-                    it.copy(session = event.session)
-                }
-            }
-
             DashboardEvent.SaveSubject -> saveSubject()
-            DashboardEvent.DeleteSession -> deleteSession()
             is DashboardEvent.OnTaskIsCompleteChange -> {
                 updateTask(event.task)
             }
@@ -152,25 +132,4 @@ class DashboardViewModel @Inject constructor(
             }
         }
     }
-
-    private fun deleteSession() {
-        viewModelScope.launch {
-            try {
-                state.value.session?.let {
-                    sessionRepository.deleteSession(it)
-                    _snackbarEventFlow.emit(
-                        SnackbarEvent.ShowSnackbar(message = "Session deleted successfully")
-                    )
-                }
-            } catch (e: Exception) {
-                _snackbarEventFlow.emit(
-                    SnackbarEvent.ShowSnackbar(
-                        message = "Couldn't delete session. ${e.message}",
-                        duration = SnackbarDuration.Long
-                    )
-                )
-            }
-        }
-    }
-
 }

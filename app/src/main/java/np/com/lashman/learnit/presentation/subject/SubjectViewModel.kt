@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import np.com.lashman.learnit.util.SnackbarEvent
-import np.com.lashman.learnit.util.toHours
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,17 +19,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import np.com.lashman.learnit.domain.model.Subject
 import np.com.lashman.learnit.domain.model.Task
-import np.com.lashman.learnit.domain.repository.SessionRepository
 import np.com.lashman.learnit.domain.repository.SubjectRepository
 import np.com.lashman.learnit.domain.repository.TaskRepository
 import np.com.lashman.learnit.presentation.navArgs
+import np.com.lashman.learnit.util.SnackbarEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class SubjectViewModel @Inject constructor(
     private val subjectRepository: SubjectRepository,
     private val taskRepository: TaskRepository,
-    private val sessionRepository: SessionRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -41,15 +38,11 @@ class SubjectViewModel @Inject constructor(
     val state = combine(
         _state,
         taskRepository.getUpcomingTasksForSubject(navArgs.subjectId),
-        taskRepository.getCompletedTasksForSubject(navArgs.subjectId),
-        sessionRepository.getRecentTenSessionsForSubject(navArgs.subjectId),
-        sessionRepository.getTotalSessionsDurationBySubject(navArgs.subjectId)
-    ) { state, upcomingTasks, completedTask, recentSessions, totalSessionsDuration ->
+        taskRepository.getCompletedTasksForSubject(navArgs.subjectId)
+    ) { state, upcomingTasks, completedTask ->
         state.copy(
             upcomingTasks = upcomingTasks,
-            completedTasks = completedTask,
-            recentSessions = recentSessions,
-            studiedHours = totalSessionsDuration.toHours()
+            completedTasks = completedTask
         )
     }.stateIn(
         scope = viewModelScope,
@@ -84,18 +77,12 @@ class SubjectViewModel @Inject constructor(
                 }
             }
 
-            is SubjectEvent.OnDeleteSessionButtonClick -> {
-                _state.update {
-                    it.copy(session = event.session)
-                }
-            }
             is SubjectEvent.OnTaskIsCompleteChange -> {
                 updateTask(event.task)
             }
 
             SubjectEvent.UpdateSubject -> updateSubject()
             SubjectEvent.DeleteSubject -> deleteSubject()
-            SubjectEvent.DeleteSession -> deleteSession()
 
             SubjectEvent.UpdateProgress -> {
                 val goalStudyHours = state.value.goalStudyHours.toFloatOrNull() ?: 1f
@@ -105,6 +92,8 @@ class SubjectViewModel @Inject constructor(
                     )
                 }
             }
+
+            SubjectEvent.DeleteSession -> TODO()
         }
     }
 
@@ -202,25 +191,4 @@ class SubjectViewModel @Inject constructor(
             }
         }
     }
-
-    private fun deleteSession() {
-        viewModelScope.launch {
-            try {
-                state.value.session?.let {
-                    sessionRepository.deleteSession(it)
-                    _snackbarEventFlow.emit(
-                        SnackbarEvent.ShowSnackbar(message = "Session deleted successfully")
-                    )
-                }
-            } catch (e: Exception) {
-                _snackbarEventFlow.emit(
-                    SnackbarEvent.ShowSnackbar(
-                        message = "Couldn't delete session. ${e.message}",
-                        duration = SnackbarDuration.Long
-                    )
-                )
-            }
-        }
-    }
-
 }

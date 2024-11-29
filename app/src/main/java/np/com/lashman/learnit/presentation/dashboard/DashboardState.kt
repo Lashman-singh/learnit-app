@@ -1,7 +1,6 @@
 package np.com.lashman.learnit.presentation.dashboard
 
 import androidx.compose.ui.graphics.Color
-import np.com.lashman.learnit.domain.model.Session
 import np.com.lashman.learnit.domain.model.Subject
 
 data class DashboardState(
@@ -11,6 +10,5 @@ data class DashboardState(
     val subjects: List<Subject> = emptyList(),
     val subjectName: String = "",
     val goalStudyHours: String = "",
-    val subjectCardColors: List<Color> = Subject.subjectCardColors.random(),
-    val session: Session? = null
+    val subjectCardColors: List<Color> = Subject.subjectCardColors.random()
 )

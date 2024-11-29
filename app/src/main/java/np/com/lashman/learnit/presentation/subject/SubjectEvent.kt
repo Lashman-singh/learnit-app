@@ -1,7 +1,6 @@
 package np.com.lashman.learnit.presentation.subject
 
 import androidx.compose.ui.graphics.Color
-import np.com.lashman.learnit.domain.model.Session
 import np.com.lashman.learnit.domain.model.Task
 
 sealed class SubjectEvent {
@@ -13,5 +12,4 @@ sealed class SubjectEvent {
     data class OnSubjectCardColorChange(val color: List<Color>): SubjectEvent()
     data class OnSubjectNameChange(val name: String): SubjectEvent()
     data class OnGoalStudyHoursChange(val hours: String): SubjectEvent()
-    data class OnDeleteSessionButtonClick(val session: Session): SubjectEvent()
 }
