@@ -71,4 +71,4 @@ Make sure you have the following installed:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/Lashman-singh/LearnIT.git
+   git clone https://github.com/Lashman-singh/learnit-app.git
