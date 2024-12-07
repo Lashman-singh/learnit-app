@@ -47,7 +47,7 @@ object DatabaseModule {
     val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             // Drop the 'Session' table if it exists (since you've deleted it)
-            database.execSQL("DROP TABLE IF EXISTS session")
+//            database.execSQL("DROP TABLE IF EXISTS session")
         }
     }
 

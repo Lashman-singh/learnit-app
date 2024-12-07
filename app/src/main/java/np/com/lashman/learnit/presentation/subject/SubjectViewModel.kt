@@ -92,8 +92,6 @@ class SubjectViewModel @Inject constructor(
                     )
                 }
             }
-
-            SubjectEvent.DeleteSession -> TODO()
         }
     }
 

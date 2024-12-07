@@ -6,7 +6,6 @@ import np.com.lashman.learnit.domain.model.Task
 sealed class SubjectEvent {
     data object UpdateSubject : SubjectEvent()
     data object DeleteSubject : SubjectEvent()
-    data object DeleteSession : SubjectEvent()
     data object UpdateProgress : SubjectEvent()
     data class OnTaskIsCompleteChange(val task: Task): SubjectEvent()
     data class OnSubjectCardColorChange(val color: List<Color>): SubjectEvent()

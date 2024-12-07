@@ -143,7 +143,7 @@ private fun SubjectScreen(
         isOpen = isDeleteSubjectDialogOpen,
         title = "Delete Subject?",
         bodyText = "Are you sure, you want to delete this subject? All related " +
-                "tasks and study sessions will be permanently removed. This action can not be undone",
+                "tasks will be permanently removed. This action can not be undone",
         onDismissRequest = { isDeleteSubjectDialogOpen = false },
         onConfirmButtonClick = {
             onEvent(SubjectEvent.DeleteSubject)

@@ -1,7 +1,8 @@
-@file:Suppress("UNREACHABLE_CODE")
-
 package np.com.lashman.learnit.presentation.api
 
+import android.content.Context  // Import Context here
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,12 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import np.com.lashman.learnit.R
 
@@ -27,6 +30,9 @@ fun WikipediaScreen(
     viewModel: WikipediaViewModel = viewModel()
 ) {
     var title by remember { mutableStateOf("") }
+
+    // Getting the context inside Composable function
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -55,13 +61,17 @@ fun WikipediaScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.img_books),
-            contentDescription = "Wikipedia Logo",
-            modifier = Modifier
-                .size(120.dp)
-                .padding(bottom = 16.dp)
-        )
+        // Image (if exists)
+        val thumbnailUrl = viewModel.summary.collectAsState().value?.thumbnail?.source
+        thumbnailUrl?.let {
+            Image(
+                painter = rememberImagePainter(it),
+                contentDescription = "Topic Image",
+                modifier = Modifier
+                    .size(200.dp)
+                    .padding(bottom = 16.dp)
+            )
+        }
 
         TextField(
             value = title,
@@ -80,7 +90,13 @@ fun WikipediaScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.fetchSummary(title) },
+            onClick = {
+                if (title.isNotBlank()) {
+                    viewModel.fetchSummary(title)
+                } else {
+                    viewModel._error.value = "Please enter a title."
+                }
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF00d2ff),
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -118,6 +134,18 @@ fun WikipediaScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
+
+                    // Related links (if any)
+                    response.content_urls?.mobile?.page?.let { url ->
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TextButton(onClick = {
+                            // Navigate to the Wikipedia page in a browser
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            context.startActivity(intent)  // Use context to start activity
+                        }) {
+                            Text(text = "Read more on Wikipedia")
+                        }
+                    }
                 }
             }
         }
