@@ -20,34 +20,34 @@ import np.com.lashman.learnit.R
 
 @Composable
 fun SubjectCard(
-    modifier: Modifier = Modifier,
-    subjectName: String,
-    gradientColors: List<Color>,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier,  // Modifier for customizing the card appearance
+    subjectName: String,  // Name of the subject to be displayed
+    gradientColors: List<Color>,  // List of colors to create a gradient background
+    onClick: () -> Unit  // Callback for the click event of the card
 ) {
     Box(
         modifier = modifier
-            .size(150.dp)
-            .clickable { onClick() }
-            .background(
+            .size(150.dp)  // Set the size of the card
+            .clickable { onClick() }  // Make the card clickable and trigger the onClick callback
+            .background(  // Set the background with a gradient brush
                 brush = Brush.verticalGradient(gradientColors),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium  // Apply a medium shape for rounded corners
             )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.padding(12.dp),  // Add padding inside the card
+            verticalArrangement = Arrangement.Center  // Center the content vertically
         ) {
             Image(
-                painter = painterResource(R.drawable.books),
-                contentDescription = subjectName,
-                modifier = Modifier.size(80.dp)
+                painter = painterResource(R.drawable.books),  // Load an image from resources
+                contentDescription = subjectName,  // Provide a description for the image
+                modifier = Modifier.size(80.dp)  // Set the size of the image
             )
             Text(
-                text = subjectName,
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
-                maxLines = 1
+                text = subjectName,  // Display the subject name
+                style = MaterialTheme.typography.headlineMedium,  // Apply the medium headline style
+                color = Color.White,  // Set the text color to white
+                maxLines = 1  // Limit the text to a single line
             )
         }
     }

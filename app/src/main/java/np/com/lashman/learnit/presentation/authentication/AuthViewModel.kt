@@ -7,48 +7,51 @@ import kotlinx.coroutines.flow.StateFlow
 
 class AuthViewModel : ViewModel() {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()  // FirebaseAuth instance for authentication
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
+    private val _isLoading = MutableStateFlow(false)  // StateFlow to track loading state
+    val isLoading: StateFlow<Boolean> get() = _isLoading  // Exposed as immutable StateFlow
 
+    // Function to sign in a user with email and password
     fun signIn(
-        email: String,
-        password: String,
-        onSignInSuccess: () -> Unit,
-        onError: (String) -> Unit
+        email: String,  // Email of the user
+        password: String,  // Password of the user
+        onSignInSuccess: () -> Unit,  // Callback when sign-in is successful
+        onError: (String) -> Unit  // Callback when an error occurs
     ) {
-        _isLoading.value = true
+        _isLoading.value = true  // Set loading state to true while signing in
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                _isLoading.value = false
+                _isLoading.value = false  // Set loading state to false after completion
                 if (task.isSuccessful) {
-                    onSignInSuccess()
+                    onSignInSuccess()  // Trigger success callback
                 } else {
-                    onError(task.exception?.message ?: "Unknown error")
+                    onError(task.exception?.message ?: "Unknown error")  // Trigger error callback
                 }
             }
     }
 
+    // Function to sign up a new user with email and password
     fun signUp(
-        email: String,
-        password: String,
-        onSignUpSuccess: () -> Unit,
-        onError: (String) -> Unit
+        email: String,  // Email of the user
+        password: String,  // Password of the user
+        onSignUpSuccess: () -> Unit,  // Callback when sign-up is successful
+        onError: (String) -> Unit  // Callback when an error occurs
     ) {
-        _isLoading.value = true
+        _isLoading.value = true  // Set loading state to true while signing up
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                _isLoading.value = false
+                _isLoading.value = false  // Set loading state to false after completion
                 if (task.isSuccessful) {
-                    onSignUpSuccess()
+                    onSignUpSuccess()  // Trigger success callback
                 } else {
-                    onError(task.exception?.localizedMessage ?: "Sign Up failed")
+                    onError(task.exception?.localizedMessage ?: "Sign Up failed")  // Trigger error callback
                 }
             }
     }
 
+    // Function to sign out the user
     fun signOut() {
-        auth.signOut()
+        auth.signOut()  // Sign out the user from Firebase
     }
 }

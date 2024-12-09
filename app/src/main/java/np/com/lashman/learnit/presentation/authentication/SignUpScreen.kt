@@ -40,15 +40,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import np.com.lashman.learnit.R
-import np.com.lashman.learnit.presentation.destinations.SignInScreenDestination
+import np.com.lashman.learnit.destinations.SignInScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun SignUpScreen(navigator: DestinationsNavigator) {
+    // Get the AuthViewModel to handle authentication-related actions
     val authViewModel: AuthViewModel = hiltViewModel()
-    val isLoading by authViewModel.isLoading.collectAsState()
+    val isLoading by authViewModel.isLoading.collectAsState() // State for loading indicator
 
+    // State variables for user input: email, password, confirm password, error message
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
@@ -56,6 +58,7 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
 
     Scaffold(
         topBar = {
+            // Top app bar with gradient background and title
             CenterAlignedTopAppBar(
                 title = { Text(text = "Create Account", style = MaterialTheme.typography.headlineSmall) },
                 colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -71,7 +74,7 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 )
             )
         },
-        containerColor = Color(0xFFE0F7FA)
+        containerColor = Color(0xFFE0F7FA) // Background color for the screen
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -89,7 +92,7 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo/Image
+            // Logo/Image displayed at the top of the screen
             Image(
                 painter = painterResource(id = R.drawable.learn_it_logo),
                 contentDescription = "Study Logo",
@@ -99,7 +102,7 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 contentScale = ContentScale.Fit
             )
 
-            // Email Input
+            // Email input field
             TextField(
                 value = email,
                 onValueChange = { email = it },
@@ -118,9 +121,9 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                     disabledContainerColor = Color.LightGray
                 )
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Space between fields
 
-            // Password Input
+            // Password input field
             TextField(
                 value = password,
                 onValueChange = { password = it },
@@ -141,9 +144,9 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Space between fields
 
-            // Confirm Password Input
+            // Confirm password input field
             TextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
@@ -164,17 +167,18 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp)) // Space between button and input fields
 
-            // Sign-Up Button
+            // Sign-up button with loading state
             Button(
                 onClick = {
+                    // Sign-up logic: Check if passwords match
                     if (password == confirmPassword) {
                         authViewModel.signUp(
                             email = email,
                             password = password,
                             onSignUpSuccess = {
-                                // Navigate to SignIn on successful sign-up
+                                // Navigate to sign-in screen on successful sign-up
                                 navigator.navigate(SignInScreenDestination()) {
                                     popUpTo(SignInScreenDestination.route) { inclusive = true }
                                 }
@@ -182,10 +186,10 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                             onError = { error -> errorMessage = error }
                         )
                     } else {
-                        errorMessage = "Passwords do not match."
+                        errorMessage = "Passwords do not match." // Show error message if passwords don't match
                     }
                 },
-                enabled = !isLoading,
+                enabled = !isLoading, // Button is disabled when loading
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -195,6 +199,7 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                     contentColor = Color.White
                 )
             ) {
+                // Show loading indicator or button text
                 if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
@@ -206,9 +211,9 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Space between button and error message
 
-            // Show error message if any
+            // Show error message if present
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
@@ -218,9 +223,9 @@ fun SignUpScreen(navigator: DestinationsNavigator) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Space between error message and sign-in navigation
 
-            // Sign-In Navigation
+            // Navigation button for existing users to sign in
             TextButton(onClick = {
                 navigator.navigate(SignInScreenDestination())
             }) {

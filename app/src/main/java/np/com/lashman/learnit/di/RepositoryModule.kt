@@ -11,18 +11,18 @@ import np.com.lashman.learnit.domain.repository.TaskRepository
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class)  // Marks this module for dependency injection in the SingletonComponent
 abstract class RepositoryModule {
 
-    @Singleton
+    @Singleton  // Specifies that the provided repository should have a single instance
     @Binds
     abstract fun bindSubjectRepository(
-        impl: SubjectRepositoryImpl
+        impl: SubjectRepositoryImpl  // Binds the SubjectRepositoryImpl to the SubjectRepository interface
     ): SubjectRepository
 
-    @Singleton
+    @Singleton  // Specifies that the provided repository should have a single instance
     @Binds
     abstract fun bindTaskRepository(
-        impl: TaskRepositoryImpl
+        impl: TaskRepositoryImpl  // Binds the TaskRepositoryImpl to the TaskRepository interface
     ): TaskRepository
 }

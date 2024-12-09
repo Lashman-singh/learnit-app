@@ -25,51 +25,51 @@ import np.com.lashman.learnit.domain.model.Subject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubjectListBottomSheet(
-    sheetState: SheetState,
-    isOpen: Boolean,
-    subjects: List<Subject>,
-    bottomSheetTitle: String = "Related to subject",
-    onSubjectClicked: (Subject) -> Unit,
-    onDismissRequest: () -> Unit
+    sheetState: SheetState,  // State of the bottom sheet to control its visibility and behavior
+    isOpen: Boolean,  // Flag indicating if the bottom sheet is open
+    subjects: List<Subject>,  // List of subjects to display in the bottom sheet
+    bottomSheetTitle: String = "Related to subject",  // Title of the bottom sheet
+    onSubjectClicked: (Subject) -> Unit,  // Callback when a subject is clicked
+    onDismissRequest: () -> Unit  // Callback when the bottom sheet is dismissed
 ) {
-    if (isOpen) {
+    if (isOpen) {  // Show the bottom sheet if the flag is true
         ModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = onDismissRequest,
-            dragHandle = {
+            sheetState = sheetState,  // Set the sheet state
+            onDismissRequest = onDismissRequest,  // Handle the dismiss request
+            dragHandle = {  // Customize the drag handle at the top of the bottom sheet
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    BottomSheetDefaults.DragHandle()
-                    Text(text = bottomSheetTitle)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Divider()
+                    BottomSheetDefaults.DragHandle()  // Default drag handle for the sheet
+                    Text(text = bottomSheetTitle)  // Display the title of the bottom sheet
+                    Spacer(modifier = Modifier.height(10.dp))  // Spacer for visual separation
+                    Divider()  // Divider below the title
                 }
             }
         ) {
             LazyColumn(
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(16.dp)  // Set padding for the list content
             ) {
-                items(subjects) { subject ->
+                items(subjects) { subject ->  // Iterate over the list of subjects
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSubjectClicked(subject) }
-                            .padding(8.dp)
+                            .fillMaxWidth()  // Fill the width of the container
+                            .clickable { onSubjectClicked(subject) }  // Handle subject click
+                            .padding(8.dp)  // Add padding inside the box
                     ) {
-                        Text(text = subject.name)
+                        Text(text = subject.name)  // Display the subject name
                     }
                 }
-                if (subjects.isEmpty()) {
+                if (subjects.isEmpty()) {  // If no subjects are available, show a placeholder message
                     item {
                         Text(
-                            modifier = Modifier.padding(10.dp),
-                            text = "Ready to begin? First, add a subject."
+                            modifier = Modifier.padding(10.dp),  // Add padding around the text
+                            text = "Ready to begin? First, add a subject."  // Message to guide the user
                         )
                     }
                 }
             }
-    }
+        }
     }
 }

@@ -47,11 +47,11 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import np.com.lashman.learnit.destinations.TaskScreenRouteDestination
 import np.com.lashman.learnit.presentation.components.AddSubjectDialog
 import np.com.lashman.learnit.presentation.components.CountCard
 import np.com.lashman.learnit.presentation.components.DeleteDialog
 import np.com.lashman.learnit.presentation.components.tasksList
-import np.com.lashman.learnit.presentation.destinations.TaskScreenRouteDestination
 import np.com.lashman.learnit.presentation.task.TaskScreenNavArgs
 import np.com.lashman.learnit.util.SnackbarEvent
 
@@ -143,7 +143,7 @@ private fun SubjectScreen(
         isOpen = isDeleteSubjectDialogOpen,
         title = "Delete Subject?",
         bodyText = "Are you sure, you want to delete this subject? All related " +
-                "tasks and study sessions will be permanently removed. This action can not be undone",
+                "tasks will be permanently removed. This action can not be undone",
         onDismissRequest = { isDeleteSubjectDialogOpen = false },
         onConfirmButtonClick = {
             onEvent(SubjectEvent.DeleteSubject)

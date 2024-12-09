@@ -42,32 +42,39 @@ import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import np.com.lashman.learnit.R
-import np.com.lashman.learnit.presentation.destinations.DashboardScreenRouteDestination
-import np.com.lashman.learnit.presentation.destinations.SignUpScreenDestination
+import np.com.lashman.learnit.destinations.DashboardScreenRouteDestination
+import np.com.lashman.learnit.destinations.SignUpScreenDestination
 
 @Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navigator: DestinationsNavigator) {
+    // Get the AuthViewModel instance using Hilt
     val authViewModel: AuthViewModel = hiltViewModel()
+
+    // Collect loading state from ViewModel
     val isLoading by authViewModel.isLoading.collectAsState()
 
+    // State variables for email, password, and error message
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var errorMessage by rememberSaveable { mutableStateOf("") }
 
+    // Check if the user is already signed in and navigate to the dashboard
     LaunchedEffect(key1 = true) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            // If the user is already logged in, navigate to the Dashboard screen
+            // Navigate to Dashboard if user is already logged in
             navigator.navigate(DashboardScreenRouteDestination()) {
                 popUpTo(DashboardScreenRouteDestination.route) { inclusive = true }
             }
         }
     }
 
+    // Scaffold for the overall layout structure
     Scaffold(
         topBar = {
+            // Top app bar with title and gradient background
             CenterAlignedTopAppBar(
                 title = { Text(text = "Welcome Back", style = MaterialTheme.typography.headlineSmall) },
                 colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -85,6 +92,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
         },
         containerColor = Color(0xFFE0F7FA)
     ) { paddingValues ->
+        // Main content column layout
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -101,7 +109,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo/Image
+            // Logo/Image at the top
             Image(
                 painter = painterResource(id = R.drawable.learn_it_logo),
                 contentDescription = "Study Logo",
@@ -111,7 +119,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                 contentScale = ContentScale.Fit
             )
 
-            // Email Input
+            // Email input field
             TextField(
                 value = email,
                 onValueChange = { email = it },
@@ -132,7 +140,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password Input
+            // Password input field
             TextField(
                 value = password,
                 onValueChange = { password = it },
@@ -180,6 +188,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                     contentColor = Color.White
                 )
             ) {
+                // Show progress indicator if loading, otherwise show "Sign In" text
                 if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
@@ -193,7 +202,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Show error message if any
+            // Show error message if any error occurs
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
@@ -205,7 +214,7 @@ fun SignInScreen(navigator: DestinationsNavigator) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sign-Up Navigation
+            // Navigation to Sign Up screen
             TextButton(onClick = {
                 navigator.navigate(SignUpScreenDestination())
             }) {
@@ -218,124 +227,3 @@ fun SignInScreen(navigator: DestinationsNavigator) {
         }
     }
 }
-
-//package np.com.lashman.learnit.presentation.authentication
-//
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.Spacer
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-//import androidx.compose.foundation.layout.height
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.foundation.layout.size
-//import androidx.compose.material3.Button
-//import androidx.compose.material3.CenterAlignedTopAppBar
-//import androidx.compose.material3.CircularProgressIndicator
-//import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.MaterialTheme
-//import androidx.compose.material3.Scaffold
-//import androidx.compose.material3.Text
-//import androidx.compose.material3.TextButton
-//import androidx.compose.material3.TextField
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.LaunchedEffect
-//import androidx.compose.runtime.collectAsState
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.runtime.saveable.rememberSaveable
-//import androidx.compose.runtime.setValue
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.input.PasswordVisualTransformation
-//import androidx.compose.ui.unit.dp
-//import androidx.hilt.navigation.compose.hiltViewModel
-//import com.google.firebase.auth.FirebaseAuth
-//import com.ramcosta.composedestinations.annotation.Destination
-//import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-//import np.com.lashman.learnit.presentation.destinations.DashboardScreenRouteDestination
-//
-//@Destination
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun SignInScreen(
-//    navigator: DestinationsNavigator
-//) {
-//    val authViewModel: AuthViewModel = hiltViewModel()
-//    val isLoading by authViewModel.isLoading.collectAsState()
-//
-//    var email by rememberSaveable { mutableStateOf("") }
-//    var password by rememberSaveable { mutableStateOf("") }
-//    var errorMessage by rememberSaveable { mutableStateOf("") }
-//
-//    Scaffold(
-//        topBar = {
-//            CenterAlignedTopAppBar(title = { Text(text = "Sign In") })
-//        }
-//    ) { paddingValues ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//                .padding(16.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            // Email Input
-//            TextField(
-//                value = email,
-//                onValueChange = { email = it },
-//                label = { Text("Email") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            // Password Input
-//            TextField(
-//                value = password,
-//                onValueChange = { password = it },
-//                label = { Text("Password") },
-//                modifier = Modifier.fillMaxWidth(),
-//                visualTransformation = PasswordVisualTransformation()
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // Sign-In Button
-//            Button(
-//                onClick = {
-//                    authViewModel.signIn(
-//                        email = email,
-//                        password = password,
-//                        onSignInSuccess = {
-//                            navigator.navigate(DashboardScreenRouteDestination())
-//                        },
-//                        onError = { error ->
-//                            errorMessage = error
-//                        }
-//                    )
-//                },
-//                enabled = !isLoading,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Text(text = if (isLoading) "Loading..." else "Sign In")
-//            }
-//
-//            // Show error message if any
-//            if (errorMessage.isNotEmpty()) {
-//                Text(
-//                    text = errorMessage,
-//                    color = Color.Red,
-//                    style = MaterialTheme.typography.bodySmall
-//                )
-//            }
-//
-//            // Sign-Up Navigation (optional)
-//            TextButton(onClick = {
-//                // Navigate to sign-up screen
-//            }) {
-//                Text(text = "Don't have an account? Sign Up")
-//            }
-//        }
-//    }
-//}

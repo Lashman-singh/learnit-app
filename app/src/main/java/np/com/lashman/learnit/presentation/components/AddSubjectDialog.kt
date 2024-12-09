@@ -44,15 +44,19 @@ fun AddSubjectDialog(
     onDismissRequest: () -> Unit,
     onConfirmButtonClick: () -> Unit
 ) {
+    // State variables to manage errors for subject name and goal hours
     var subjectNameError by rememberSaveable { mutableStateOf<String?>(null) }
     var goalHoursError by rememberSaveable { mutableStateOf<String?>(null) }
 
+    // Validation for subject name: checks for length and blank input
     subjectNameError = when {
         subjectName.isBlank() -> "Please enter subject name."
         subjectName.length < 2 -> "Subject name is too short."
         subjectName.length > 20 -> "Subject name is too long."
         else -> null
     }
+
+    // Validation for goal hours: checks for blank, non-numeric, and out-of-range values
     goalHoursError = when {
         goalHours.isBlank() -> "Please enter goal study hours."
         goalHours.toFloatOrNull() == null -> "Invalid number."
@@ -61,65 +65,70 @@ fun AddSubjectDialog(
         else -> null
     }
 
+    // Display the dialog if isOpen is true
     if (isOpen) {
         AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = { Text(text = title) },
+            onDismissRequest = onDismissRequest,  // Function to dismiss the dialog
+            title = { Text(text = title) },  // Title of the dialog
             text = {
                 Column {
+                    // Color selection row with circular boxes for each color
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
+                        // Iterates through predefined colors to display circular boxes
                         Subject.subjectCardColors.forEach { colors ->
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .clip(CircleShape)
+                                    .size(24.dp)  // Circle size
+                                    .clip(CircleShape)  // Clip to circle shape
                                     .border(
                                         width = 1.dp,
                                         color = if (colors == selectedColors) Color.Black
-                                        else Color.Transparent,
+                                        else Color.Transparent,  // Border for selected color
                                         shape = CircleShape
                                     )
-                                    .background(brush = Brush.verticalGradient(colors))
-                                    .clickable { onColorChange(colors) }
+                                    .background(brush = Brush.verticalGradient(colors))  // Gradient color background
+                                    .clickable { onColorChange(colors) }  // On click, change color
                             )
                         }
                     }
+                    // Subject name input field with validation error message if applicable
                     OutlinedTextField(
                         value = subjectName,
-                        onValueChange = onSubjectNameChange,
-                        label = { Text(text = "Subject Name") },
+                        onValueChange = onSubjectNameChange,  // Callback to update subject name
+                        label = { Text(text = "Subject Name") },  // Label for input field
                         singleLine = true,
-                        isError = subjectNameError != null && subjectName.isNotBlank(),
-                        supportingText = { Text(text = subjectNameError.orEmpty())}
+                        isError = subjectNameError != null && subjectName.isNotBlank(),  // Show error if validation fails
+                        supportingText = { Text(text = subjectNameError.orEmpty())}  // Display error message
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))  // Spacer between fields
+                    // Goal hours input field with validation error message if applicable
                     OutlinedTextField(
                         value = goalHours,
-                        onValueChange = onGoalHoursChange,
-                        label = { Text(text = "Goal Study Hours") },
+                        onValueChange = onGoalHoursChange,  // Callback to update goal hours
+                        label = { Text(text = "Goal Study Hours") },  // Label for input field
                         singleLine = true,
-                        isError = goalHoursError != null && goalHours.isNotBlank(),
-                        supportingText = { Text(text = goalHoursError.orEmpty())},
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        isError = goalHoursError != null && goalHours.isNotBlank(),  // Show error if validation fails
+                        supportingText = { Text(text = goalHoursError.orEmpty())},  // Display error message
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)  // Numeric keyboard for goal hours input
                     )
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text(text = "Cancel")
+                TextButton(onClick = onDismissRequest) {  // Button to dismiss the dialog
+                    Text(text = "Cancel")  // Cancel button text
                 }
             },
             confirmButton = {
                 TextButton(
-                    onClick = onConfirmButtonClick,
-                    enabled = subjectNameError == null && goalHoursError == null
+                    onClick = onConfirmButtonClick,  // Button to confirm and save the subject
+                    enabled = subjectNameError == null && goalHoursError == null  // Enable button only if no errors
                 ) {
-                    Text(text = "Save")
+                    Text(text = "Save")  // Save button text
                 }
             }
         )

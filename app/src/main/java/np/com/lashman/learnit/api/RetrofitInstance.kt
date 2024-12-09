@@ -1,5 +1,6 @@
-package np.com.lashman.learnit.network
+package np.com.lashman.learnit.api
 
+import np.com.lashman.learnit.domain.repository.WikipediaApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
