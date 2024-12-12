@@ -49,34 +49,18 @@ import np.com.lashman.learnit.destinations.SignUpScreenDestination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navigator: DestinationsNavigator) {
-    // Get the AuthViewModel instance using Hilt
     val authViewModel: AuthViewModel = hiltViewModel()
-
-    // Collect loading state from ViewModel
     val isLoading by authViewModel.isLoading.collectAsState()
 
-    // State variables for email, password, and error message
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var errorMessage by rememberSaveable { mutableStateOf("") }
+    var resetEmailMessage by rememberSaveable { mutableStateOf("") }
 
-    // Check if the user is already signed in and navigate to the dashboard
-    LaunchedEffect(key1 = true) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            // Navigate to Dashboard if user is already logged in
-            navigator.navigate(DashboardScreenRouteDestination()) {
-                popUpTo(DashboardScreenRouteDestination.route) { inclusive = true }
-            }
-        }
-    }
-
-    // Scaffold for the overall layout structure
     Scaffold(
         topBar = {
-            // Top app bar with title and gradient background
             CenterAlignedTopAppBar(
-                title = { Text(text = "Welcome Back", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text("Sign In", style = MaterialTheme.typography.headlineSmall) },
                 colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent
                 ),
@@ -92,41 +76,28 @@ fun SignInScreen(navigator: DestinationsNavigator) {
         },
         containerColor = Color(0xFFE0F7FA)
     ) { paddingValues ->
-        // Main content column layout
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(24.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFE0F7FA),
-                            Color.White
-                        )
-                    )
-                ),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo/Image at the top
             Image(
                 painter = painterResource(id = R.drawable.learn_it_logo),
                 contentDescription = "Study Logo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 24.dp),
+                modifier = Modifier.size(120.dp),
                 contentScale = ContentScale.Fit
             )
 
-            // Email input field
+            Spacer(modifier = Modifier.height(16.dp))
+
             TextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -134,20 +105,17 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                     focusedIndicatorColor = Color(0xFF00695C),
                     unfocusedIndicatorColor = Color.Gray,
                     focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    disabledContainerColor = Color.LightGray
+                    unfocusedTextColor = Color.Black
                 )
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password input field
             TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
@@ -156,21 +124,18 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                     focusedIndicatorColor = Color(0xFF00695C),
                     unfocusedIndicatorColor = Color.Gray,
                     focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    disabledContainerColor = Color.LightGray
+                    unfocusedTextColor = Color.Black
                 )
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Sign-In Button
             Button(
                 onClick = {
                     authViewModel.signIn(
                         email = email,
                         password = password,
                         onSignInSuccess = {
-                            // Navigate to Dashboard on successful login
                             navigator.navigate(DashboardScreenRouteDestination()) {
                                 popUpTo(DashboardScreenRouteDestination.route) { inclusive = true }
                             }
@@ -179,16 +144,13 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                     )
                 },
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF00695C),
                     contentColor = Color.White
                 )
             ) {
-                // Show progress indicator if loading, otherwise show "Sign In" text
                 if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
@@ -196,13 +158,12 @@ fun SignInScreen(navigator: DestinationsNavigator) {
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(text = "Sign In", style = MaterialTheme.typography.titleMedium)
+                    Text("Sign In", style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Show error message if any error occurs
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
@@ -214,16 +175,46 @@ fun SignInScreen(navigator: DestinationsNavigator) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Navigation to Sign Up screen
             TextButton(onClick = {
                 navigator.navigate(SignUpScreenDestination())
             }) {
                 Text(
-                    text = "Don't have an account? Sign Up",
+                    "Don't have an account? Sign Up",
                     color = Color(0xFF004D40),
                     fontWeight = FontWeight.Medium
+                )
+            }
+
+            TextButton(onClick = {
+                if (email.isNotEmpty()) {
+                    FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                        .addOnCompleteListener { task ->
+                            resetEmailMessage = if (task.isSuccessful) {
+                                "Password reset email sent."
+                            } else {
+                                "Failed to send password reset email."
+                            }
+                        }
+                } else {
+                    resetEmailMessage = "Please enter your email to reset password."
+                }
+            }) {
+                Text(
+                    "Forgot Password?",
+                    color = Color(0xFF004D40),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            if (resetEmailMessage.isNotEmpty()) {
+                Text(
+                    text = resetEmailMessage,
+                    color = if (resetEmailMessage == "Password reset email sent.") Color.Green else Color.Red,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(8.dp)
                 )
             }
         }
     }
 }
+
