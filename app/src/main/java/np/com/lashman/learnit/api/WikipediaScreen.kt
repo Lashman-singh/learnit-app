@@ -1,5 +1,6 @@
-package np.com.lashman.learnit.api
+package np.com.lashman.learnit.presentation.api
 
+import android.content.Context  // Import Context here
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -19,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
+import np.com.lashman.learnit.R
 
 @Destination
 @Composable
@@ -152,5 +155,4 @@ fun WikipediaScreen(
 @Preview(showBackground = true)
 @Composable
 fun WikipediaScreenPreview() {
-    // Preview content goes here
 }

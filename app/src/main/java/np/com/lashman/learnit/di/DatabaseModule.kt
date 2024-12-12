@@ -14,8 +14,9 @@ import np.com.lashman.learnit.data.local.TaskDao
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)  // Marks this module for dependency injection in the SingletonComponent
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
+
 
     @Provides
     @Singleton
@@ -26,29 +27,28 @@ object DatabaseModule {
             .databaseBuilder(
                 application,
                 AppDatabase::class.java,
-                "learnit.db" // Database name
+                "learnit.db"
             )
-            .addMigrations(MIGRATION_1_2) // Adds migration logic for version 1 to 2
-            .build()  // Builds and returns the database instance
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides
     @Singleton
     fun provideSubjectDao(database: AppDatabase): SubjectDao {
-        return database.subjectDao()  // Provides the SubjectDao from the database
+        return database.subjectDao()
     }
 
     @Provides
     @Singleton
     fun provideTaskDaoDao(database: AppDatabase): TaskDao {
-        return database.taskDao()  // Provides the TaskDao from the database
+        return database.taskDao()
     }
-
-    // Migration from version 1 to version 2
     val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             // Drop the 'Session' table if it exists (since you've deleted it)
-            // database.execSQL("DROP TABLE IF EXISTS session")
+            database.execSQL("DROP TABLE IF EXISTS session")
         }
     }
+
 }
