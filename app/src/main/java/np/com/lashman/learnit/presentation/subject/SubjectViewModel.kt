@@ -21,7 +21,7 @@ import np.com.lashman.learnit.domain.model.Subject
 import np.com.lashman.learnit.domain.model.Task
 import np.com.lashman.learnit.domain.repository.SubjectRepository
 import np.com.lashman.learnit.domain.repository.TaskRepository
-import np.com.lashman.learnit.navArgs
+import np.com.lashman.learnit.presentation.navArgs
 import np.com.lashman.learnit.util.SnackbarEvent
 import javax.inject.Inject
 

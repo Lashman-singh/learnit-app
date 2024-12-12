@@ -40,7 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import np.com.lashman.learnit.R
-import np.com.lashman.learnit.destinations.SignInScreenDestination
+import np.com.lashman.learnit.presentation.destinations.SignInScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination

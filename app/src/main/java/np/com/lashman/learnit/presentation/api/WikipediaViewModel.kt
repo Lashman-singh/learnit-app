@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import np.com.lashman.learnit.api.RetrofitInstance
 import np.com.lashman.learnit.domain.model.WikipediaResponse
-import np.com.lashman.learnit.network.RetrofitInstance
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.URLEncoder

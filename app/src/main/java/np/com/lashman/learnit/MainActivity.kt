@@ -16,7 +16,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
-import np.com.lashman.learnit.destinations.SignInScreenDestination
+import np.com.lashman.learnit.presentation.NavGraphs
+import np.com.lashman.learnit.presentation.destinations.SignInScreenDestination
 import np.com.lashman.learnit.presentation.theme.LearnITTheme
 
 // Annotating with @AndroidEntryPoint allows this Activity to receive dependencies injected by Hilt
