@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import np.com.lashman.learnit.R
+import np.com.lashman.learnit.api.WikipediaViewModel
 
 @Destination
 @Composable

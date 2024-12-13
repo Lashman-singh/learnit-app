@@ -1,7 +1,7 @@
-package np.com.lashman.learnit.domain.repository
+package np.com.lashman.learnit.api
 
+import np.com.lashman.learnit.domain.model.SearchResponse
 import np.com.lashman.learnit.domain.model.WikipediaResponse
-import np.com.lashman.learnit.domain.model.SearchResponse  // Import the SearchResponse model
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
